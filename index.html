@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>뉴모피즘 퍼스널 카운트다운</title>
+    <title>클라우드 동기화 카운트다운</title>
     <style>
         :root {
-            --bg-color: #F0F5F9;
-            --text-color: #333333;
-            --shadow-light: #ffffff;
-            --shadow-dark: #d1d9e6;
+            --bg-color: #F0F5F9; --text-color: #333333;
+            --shadow-light: #ffffff; --shadow-dark: #d1d9e6;
             --accent-color: #A8B8D0; 
         }
         body {
@@ -18,77 +16,41 @@
             display: flex; flex-direction: column; align-items: center;
             padding: 20px 10px; margin: 0; min-height: 100vh;
         }
-        
-        /* 상단 탭 영역 */
-        .nav-bar {
-            display: flex; align-items: center; width: 100%; max-width: 500px;
-            margin-bottom: 20px; gap: 10px;
-        }
-        .tab-list {
-            display: flex; overflow-x: auto; gap: 10px; padding: 10px;
-            flex-grow: 1; scrollbar-width: none;
-        }
+        .nav-bar { display: flex; align-items: center; width: 100%; max-width: 500px; margin-bottom: 20px; gap: 10px; }
+        .tab-list { display: flex; overflow-x: auto; gap: 10px; padding: 10px; flex-grow: 1; scrollbar-width: none; }
         .tab-list::-webkit-scrollbar { display: none; }
-        
         .tab {
-            padding: 10px 15px; border-radius: 20px; font-weight: bold;
-            font-size: 14px; cursor: pointer; white-space: nowrap;
-            background: var(--bg-color); color: #777;
+            padding: 10px 15px; border-radius: 20px; font-weight: bold; font-size: 14px; cursor: pointer;
+            white-space: nowrap; background: var(--bg-color); color: #777;
             box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
-            transition: all 0.2s; border: none; outline: none;
-            display: flex; align-items: center; gap: 8px;
+            transition: all 0.2s; border: none; outline: none; display: flex; align-items: center; gap: 8px;
         }
-        .tab.active {
-            color: var(--accent-color);
-            box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
-        }
-        .delete-btn {
-            font-size: 16px; color: #cc7a7a; border: none; background: none; cursor: pointer; padding: 0 2px;
-        }
+        .tab.active { color: var(--accent-color); box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light); }
+        .delete-btn { font-size: 16px; color: #cc7a7a; border: none; background: none; cursor: pointer; padding: 0 2px; }
         .add-tab-btn {
-            width: 40px; height: 40px; border-radius: 50%; font-size: 20px;
-            font-weight: bold; cursor: pointer; border: none; background: var(--bg-color);
-            color: #555; display: flex; justify-content: center; align-items: center;
-            box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
-            flex-shrink: 0;
+            width: 40px; height: 40px; border-radius: 50%; font-size: 20px; font-weight: bold; cursor: pointer;
+            border: none; background: var(--bg-color); color: #555; display: flex; justify-content: center; align-items: center;
+            box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light); flex-shrink: 0;
         }
-
-        /* 설정 영역 */
+        .add-tab-btn:active { box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light); }
         .header { width: 100%; max-width: 500px; text-align: center; margin-bottom: 30px; }
         input[type="text"], input[type="datetime-local"] {
-            width: 90%; padding: 12px; margin: 8px 0; border: none;
-            border-radius: 12px; background: var(--bg-color);
-            box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+            width: 90%; padding: 12px; margin: 8px 0; border: none; border-radius: 12px;
+            background: var(--bg-color); box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
             outline: none; font-size: 16px; color: var(--text-color); text-align: center;
         }
-
-        /* 대시보드 */
-        .dashboard {
-            display: flex; justify-content: space-around; width: 100%; max-width: 500px;
-            padding: 10px 0;
-        }
+        .dashboard { display: flex; justify-content: space-around; width: 100%; max-width: 500px; padding: 10px 0; }
         .bar-container { display: flex; flex-direction: column; align-items: center; width: 22%; }
         .bar-wrapper {
             width: 100%; max-width: 50px; height: 250px; border-radius: 25px;
             background: var(--bg-color); position: relative; overflow: hidden;
-            box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
-            margin-bottom: 15px;
+            box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light); margin-bottom: 15px;
         }
-        .bar-fill {
-            width: 100%; background-color: var(--accent-color);
-            position: absolute; bottom: 0; height: 0%;
-            transition: background-color 0.3s ease;
-        }
+        .bar-fill { width: 100%; background-color: var(--accent-color); position: absolute; bottom: 0; height: 0%; transition: background-color 0.3s ease; }
         .label { font-size: 14px; font-weight: bold; margin-bottom: 5px; }
         .value { font-size: 12px; font-weight: bold; }
-
-        /* 하단 팔레트 */
         .palette { display: flex; gap: 15px; margin-top: 30px; justify-content: center; flex-wrap: wrap; max-width: 500px;}
-        .color-swatch {
-            width: 35px; height: 35px; border-radius: 50%; cursor: pointer;
-            box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
-            transition: transform 0.2s;
-        }
+        .color-swatch { width: 35px; height: 35px; border-radius: 50%; cursor: pointer; box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light); transition: transform 0.2s; }
         .color-swatch:active { transform: scale(0.9); }
     </style>
 </head>
@@ -100,31 +62,15 @@
     </div>
 
     <div class="header">
-        <input type="text" id="tabNameInput" placeholder="타이머 이름" oninput="updateTabName()">
+        <input type="text" id="tabNameInput" placeholder="데이터 불러오는 중..." oninput="updateTabName()">
         <input type="datetime-local" id="targetDateInput" onchange="updateTargetDate()">
     </div>
 
     <div class="dashboard">
-        <div class="bar-container">
-            <div class="label">일</div>
-            <div class="bar-wrapper"><div class="bar-fill" id="fill-days"></div></div>
-            <div class="value" id="val-days">0일</div>
-        </div>
-        <div class="bar-container">
-            <div class="label">시간</div>
-            <div class="bar-wrapper"><div class="bar-fill" id="fill-hours"></div></div>
-            <div class="value" id="val-hours">0시간</div>
-        </div>
-        <div class="bar-container">
-            <div class="label">분</div>
-            <div class="bar-wrapper"><div class="bar-fill" id="fill-minutes"></div></div>
-            <div class="value" id="val-minutes">0분</div>
-        </div>
-        <div class="bar-container">
-            <div class="label">초</div>
-            <div class="bar-wrapper"><div class="bar-fill" id="fill-seconds"></div></div>
-            <div class="value" id="val-seconds">0.0초</div>
-        </div>
+        <div class="bar-container"><div class="label">일</div><div class="bar-wrapper"><div class="bar-fill" id="fill-days"></div></div><div class="value" id="val-days">0일</div></div>
+        <div class="bar-container"><div class="label">시간</div><div class="bar-wrapper"><div class="bar-fill" id="fill-hours"></div></div><div class="value" id="val-hours">0시간</div></div>
+        <div class="bar-container"><div class="label">분</div><div class="bar-wrapper"><div class="bar-fill" id="fill-minutes"></div></div><div class="value" id="val-minutes">0분</div></div>
+        <div class="bar-container"><div class="label">초</div><div class="bar-wrapper"><div class="bar-fill" id="fill-seconds"></div></div><div class="value" id="val-seconds">0.0초</div></div>
     </div>
 
     <div class="palette">
@@ -136,9 +82,41 @@
         <div class="color-swatch" style="background-color: #FADCD0;" onclick="changeColor('#FADCD0')"></div>
     </div>
 
-    <script>
-        // 로컬 스토리지 키 값
-        const STORAGE_KEY = 'NEUMORPHIC_COUNTDOWN_TABS';
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // 인영 님이 전달해주신 Firebase 설정값
+        const firebaseConfig = {
+            apiKey: "AIzaSyDeZu8CtIjAcZo-967CgvxplKAzxzLQoMU",
+            authDomain: "countdown-54a90.firebaseapp.com",
+            projectId: "countdown-54a90",
+            storageBucket: "countdown-54a90.firebasestorage.app",
+            messagingSenderId: "573931728397",
+            appId: "1:573931728397:web:19f4b75cbec41c5ac3af44",
+            measurementId: "G-15J60RX3TM"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        // 클라우드 내에 'appData' 컬렉션의 'myTabs' 문서를 데이터베이스 창고로 사용합니다.
+        const docRef = doc(db, "appData", "myTabs");
+
+        let tabs = [];
+        let activeTabId = null;
+        let isDataLoaded = false;
+
+        const tabListEl = document.getElementById('tabList');
+        const nameInputEl = document.getElementById('tabNameInput');
+        const dateInputEl = document.getElementById('targetDateInput');
+
+        // 클라우드에 데이터 저장하기
+        function saveData() {
+            setDoc(docRef, { tabs: tabs }).catch(error => {
+                console.error("데이터 저장 실패:", error);
+            });
+        }
 
         function getDefaultDateStr(daysAdded) {
             const d = new Date();
@@ -147,19 +125,24 @@
             return d.toISOString().slice(0, 16);
         }
 
-        // 데이터 저장 및 불러오기 로직
-        let tabs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
-            { id: Date.now(), name: "시험 준비", dateStr: getDefaultDateStr(100), color: "#A8B8D0", initialDays: 100 }
-        ];
-        let activeTabId = tabs[0].id;
-
-        const tabListEl = document.getElementById('tabList');
-        const nameInputEl = document.getElementById('tabNameInput');
-        const dateInputEl = document.getElementById('targetDateInput');
-
-        function saveData() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(tabs));
-        }
+        // 실시간 클라우드 감시 (앱이 켜지거나 외부에서 데이터가 바뀔 때 자동으로 실행)
+        onSnapshot(docRef, (docSnap) => {
+            if (docSnap.exists()) {
+                tabs = docSnap.data().tabs;
+                if (tabs.length > 0 && (!activeTabId || !tabs.find(t => t.id === activeTabId))) {
+                    activeTabId = tabs[0].id;
+                }
+            } else {
+                // 클라우드가 비어있으면 초기 기본값(보세사 시험 등)을 세팅하고 저장합니다.
+                tabs = [{ id: Date.now(), name: "새 카운트다운", dateStr: getDefaultDateStr(100), color: "#A8B8D0", initialDays: 100 }];
+                saveData();
+            }
+            isDataLoaded = true;
+            if (tabs.length > 0) {
+                renderTabs();
+                updateUIFromTab(activeTabId);
+            }
+        });
 
         function renderTabs() {
             tabListEl.innerHTML = '';
@@ -174,64 +157,78 @@
             });
         }
 
-        function switchTab(id) {
-            activeTabId = id;
+        function updateUIFromTab(id) {
             const activeTab = tabs.find(t => t.id === id);
-            nameInputEl.value = activeTab.name;
-            dateInputEl.value = activeTab.dateStr;
-            document.documentElement.style.setProperty('--accent-color', activeTab.color);
+            if(activeTab) {
+                nameInputEl.value = activeTab.name;
+                dateInputEl.value = activeTab.dateStr;
+                document.documentElement.style.setProperty('--accent-color', activeTab.color);
+            }
+        }
+
+        // --- 외부(HTML)에서 버튼 클릭 시 모듈 안의 함수를 실행할 수 있도록 연결 ---
+        window.switchTab = (id) => {
+            activeTabId = id;
+            updateUIFromTab(id);
             renderTabs();
-        }
+        };
 
-        function addTab() {
+        window.addTab = () => {
+            if(!isDataLoaded) return;
             const newId = Date.now();
-            tabs.push({
-                id: newId, name: "새 목표", dateStr: getDefaultDateStr(30), color: "#9EAC8E", initialDays: 30
-            });
+            tabs.push({ id: newId, name: "새 목표", dateStr: getDefaultDateStr(30), color: "#9EAC8E", initialDays: 30 });
+            activeTabId = newId;
             saveData();
-            switchTab(newId);
-        }
+        };
 
-        function deleteTab(id) {
+        window.deleteTab = (id) => {
             if (confirm("이 카운트다운을 삭제할까요?")) {
                 tabs = tabs.filter(t => t.id !== id);
                 if (activeTabId === id) activeTabId = tabs[0].id;
                 saveData();
-                switchTab(activeTabId);
             }
-        }
+        };
 
-        function updateTabName() {
+        window.updateTabName = () => {
             const activeTab = tabs.find(t => t.id === activeTabId);
-            activeTab.name = nameInputEl.value;
-            saveData();
-            renderTabs(); 
-        }
-
-        function updateTargetDate() {
-            const activeTab = tabs.find(t => t.id === activeTabId);
-            activeTab.dateStr = dateInputEl.value;
-            if(activeTab.dateStr) {
-                const targetTime = new Date(activeTab.dateStr).getTime();
-                const now = new Date().getTime();
-                activeTab.initialDays = (targetTime - now) / (1000 * 60 * 60 * 24);
-                if(activeTab.initialDays <= 0) activeTab.initialDays = 1;
+            if(activeTab) {
+                activeTab.name = nameInputEl.value;
+                saveData();
             }
-            saveData();
-        }
+        };
 
-        function changeColor(colorHex) {
+        window.updateTargetDate = () => {
             const activeTab = tabs.find(t => t.id === activeTabId);
-            activeTab.color = colorHex;
-            document.documentElement.style.setProperty('--accent-color', colorHex);
-            saveData();
-        }
+            if(activeTab) {
+                activeTab.dateStr = dateInputEl.value;
+                if(activeTab.dateStr) {
+                    const targetTime = new Date(activeTab.dateStr).getTime();
+                    const now = new Date().getTime();
+                    activeTab.initialDays = (targetTime - now) / (1000 * 60 * 60 * 24);
+                    if(activeTab.initialDays <= 0) activeTab.initialDays = 1;
+                }
+                saveData();
+            }
+        };
 
+        window.changeColor = (colorHex) => {
+            const activeTab = tabs.find(t => t.id === activeTabId);
+            if(activeTab) {
+                activeTab.color = colorHex;
+                document.documentElement.style.setProperty('--accent-color', colorHex);
+                saveData();
+            }
+        };
+
+        // 타이머 애니메이션 엔진
         function updateTimer() {
+            if (!isDataLoaded || tabs.length === 0) {
+                requestAnimationFrame(updateTimer); return;
+            }
+
             const activeTab = tabs.find(t => t.id === activeTabId);
             if (!activeTab || !activeTab.dateStr) {
-                requestAnimationFrame(updateTimer);
-                return;
+                requestAnimationFrame(updateTimer); return;
             }
 
             const targetTime = new Date(activeTab.dateStr).getTime();
@@ -241,32 +238,29 @@
             if (difference <= 0) {
                 document.getElementById('val-days').textContent = "완료!";
                 ['days', 'hours', 'minutes', 'seconds'].forEach(u => document.getElementById(`fill-${u}`).style.height = '0%');
-                requestAnimationFrame(updateTimer);
-                return;
+                requestAnimationFrame(updateTimer); return;
             }
 
-            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-            const ms = Math.floor(difference % 1000);
+            const d = Math.floor(difference / 86400000);
+            const h = Math.floor((difference % 86400000) / 3600000);
+            const m = Math.floor((difference % 3600000) / 60000);
+            const s = Math.floor((difference % 60000) / 1000);
+            const ms = difference % 1000;
 
-            document.getElementById('val-days').textContent = days + "일";
-            document.getElementById('val-hours').textContent = hours + "시간";
-            document.getElementById('val-minutes').textContent = minutes + "분";
-            document.getElementById('val-seconds').textContent = seconds + "." + Math.floor(ms/100) + "초";
+            document.getElementById('val-days').textContent = d + "일";
+            document.getElementById('val-hours').textContent = h + "시간";
+            document.getElementById('val-minutes').textContent = m + "분";
+            document.getElementById('val-seconds').textContent = s + "." + Math.floor(ms/100) + "초";
 
-            document.getElementById('fill-seconds').style.height = ((seconds + (ms / 1000)) / 60 * 100) + '%';
-            document.getElementById('fill-minutes').style.height = ((minutes + (seconds / 60)) / 60 * 100) + '%';
-            document.getElementById('fill-hours').style.height = ((hours + (minutes / 60)) / 24 * 100) + '%';
-            let dP = (days / activeTab.initialDays) * 100;
+            document.getElementById('fill-seconds').style.height = ((s + (ms / 1000)) / 60 * 100) + '%';
+            document.getElementById('fill-minutes').style.height = ((m + (s / 60)) / 60 * 100) + '%';
+            document.getElementById('fill-hours').style.height = ((h + (m / 60)) / 24 * 100) + '%';
+            let dP = (d / activeTab.initialDays) * 100;
             document.getElementById('fill-days').style.height = (dP > 100 ? 100 : dP) + '%';
 
             requestAnimationFrame(updateTimer);
         }
         
-        renderTabs();
-        switchTab(activeTabId);
         requestAnimationFrame(updateTimer);
     </script>
 </body>
