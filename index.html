@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>클라우드 동기화 카운트다운</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --bg-color: #F0F5F9; --text-color: #333333;
@@ -12,10 +15,15 @@
         }
         body {
             background-color: var(--bg-color); color: var(--text-color);
-            font-family: 'Malgun Gothic', sans-serif;
+            
+            /* 2. 이 부분을 Noto Sans KR로 변경합니다. */
+            font-family: 'Noto Sans KR', sans-serif;
+            
             display: flex; flex-direction: column; align-items: center;
             padding: 20px 10px; margin: 0; min-height: 100vh;
         }
+        
+        /* ... (이하 기존 CSS 코드는 그대로 유지) ... */
         .nav-bar { display: flex; align-items: center; width: 100%; max-width: 500px; margin-bottom: 20px; gap: 10px; }
         .tab-list { display: flex; overflow-x: auto; gap: 10px; padding: 10px; flex-grow: 1; scrollbar-width: none; }
         .tab-list::-webkit-scrollbar { display: none; }
