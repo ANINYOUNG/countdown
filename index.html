@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>클라우드 동기화 카운트다운</title>
     
+    <!-- Noto Sans KR 폰트 적용 -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
@@ -15,15 +16,10 @@
         }
         body {
             background-color: var(--bg-color); color: var(--text-color);
-            
-            /* 2. 이 부분을 Noto Sans KR로 변경합니다. */
             font-family: 'Noto Sans KR', sans-serif;
-            
             display: flex; flex-direction: column; align-items: center;
             padding: 20px 10px; margin: 0; min-height: 100vh;
         }
-        
-        /* ... (이하 기존 CSS 코드는 그대로 유지) ... */
         .nav-bar { display: flex; align-items: center; width: 100%; max-width: 500px; margin-bottom: 20px; gap: 10px; }
         .tab-list { display: flex; overflow-x: auto; gap: 10px; padding: 10px; flex-grow: 1; scrollbar-width: none; }
         .tab-list::-webkit-scrollbar { display: none; }
@@ -49,17 +45,38 @@
         }
         .dashboard { display: flex; justify-content: space-around; width: 100%; max-width: 500px; padding: 10px 0; }
         .bar-container { display: flex; flex-direction: column; align-items: center; width: 22%; }
+        
         .bar-wrapper {
             width: 100%; max-width: 50px; height: 250px; border-radius: 25px;
             background: var(--bg-color); position: relative; overflow: hidden;
             box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light); margin-bottom: 15px;
+            transition: all 0.3s ease;
         }
-        .bar-fill { width: 100%; background-color: var(--accent-color); position: absolute; bottom: 0; height: 0%; transition: background-color 0.3s ease; border-radius: 25px; box-shadow: inset 3px 3px 6px rgba(255, 255, 255, 0.5), inset -3px -3px 6px rgba(0, 0, 0, 0.2);}
+        
+        /* 막대 내부 입체감 반영 */
+        .bar-fill { 
+            width: 100%; background-color: var(--accent-color); position: absolute; bottom: 0; height: 0%; 
+            transition: background-color 0.5s ease, height 0.1s linear; 
+            border-radius: 25px;
+            box-shadow: inset 3px 3px 6px rgba(255, 255, 255, 0.5), inset -3px -3px 6px rgba(0, 0, 0, 0.2);
+        }
+        
         .label { font-size: 14px; font-weight: bold; margin-bottom: 5px; }
         .value { font-size: 12px; font-weight: bold; }
         .palette { display: flex; gap: 15px; margin-top: 30px; justify-content: center; flex-wrap: wrap; max-width: 500px;}
         .color-swatch { width: 35px; height: 35px; border-radius: 50%; cursor: pointer; box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light); transition: transform 0.2s; }
         .color-swatch:active { transform: scale(0.9); }
+
+        /* 심박수(Pulse) 애니메이션 정의 */
+        @keyframes heartbeat {
+            0% { transform: scale(1); box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light); }
+            15% { transform: scale(1.05); box-shadow: 0 0 10px rgba(217, 115, 115, 0.4), inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light); }
+            30% { transform: scale(1); box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light); }
+            45% { transform: scale(1.05); box-shadow: 0 0 10px rgba(217, 115, 115, 0.4), inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light); }
+            100% { transform: scale(1); box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light); }
+        }
+        .pulse-active { animation: heartbeat 1.5s infinite ease-in-out; }
+
     </style>
 </head>
 <body>
@@ -75,7 +92,8 @@
     </div>
 
     <div class="dashboard">
-        <div class="bar-container"><div class="label">일</div><div class="bar-wrapper"><div class="bar-fill" id="fill-days"></div></div><div class="value" id="val-days">0일</div></div>
+        <!-- 일(Day) 막대 래퍼에 ID를 추가하여 심박수 애니메이션을 제어합니다. -->
+        <div class="bar-container"><div class="label">일</div><div class="bar-wrapper" id="wrapper-days"><div class="bar-fill" id="fill-days"></div></div><div class="value" id="val-days">0일</div></div>
         <div class="bar-container"><div class="label">시간</div><div class="bar-wrapper"><div class="bar-fill" id="fill-hours"></div></div><div class="value" id="val-hours">0시간</div></div>
         <div class="bar-container"><div class="label">분</div><div class="bar-wrapper"><div class="bar-fill" id="fill-minutes"></div></div><div class="value" id="val-minutes">0분</div></div>
         <div class="bar-container"><div class="label">초</div><div class="bar-wrapper"><div class="bar-fill" id="fill-seconds"></div></div><div class="value" id="val-seconds">0.0초</div></div>
@@ -94,7 +112,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // 인영 님이 전달해주신 Firebase 설정값
         const firebaseConfig = {
             apiKey: "AIzaSyDeZu8CtIjAcZo-967CgvxplKAzxzLQoMU",
             authDomain: "countdown-54a90.firebaseapp.com",
@@ -107,8 +124,6 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        
-        // 클라우드 내에 'appData' 컬렉션의 'myTabs' 문서를 데이터베이스 창고로 사용합니다.
         const docRef = doc(db, "appData", "myTabs");
 
         let tabs = [];
@@ -118,12 +133,10 @@
         const tabListEl = document.getElementById('tabList');
         const nameInputEl = document.getElementById('tabNameInput');
         const dateInputEl = document.getElementById('targetDateInput');
+        const wrapperDaysEl = document.getElementById('wrapper-days');
 
-        // 클라우드에 데이터 저장하기
         function saveData() {
-            setDoc(docRef, { tabs: tabs }).catch(error => {
-                console.error("데이터 저장 실패:", error);
-            });
+            setDoc(docRef, { tabs: tabs }).catch(error => { console.error("데이터 저장 실패:", error); });
         }
 
         function getDefaultDateStr(daysAdded) {
@@ -133,23 +146,16 @@
             return d.toISOString().slice(0, 16);
         }
 
-        // 실시간 클라우드 감시 (앱이 켜지거나 외부에서 데이터가 바뀔 때 자동으로 실행)
         onSnapshot(docRef, (docSnap) => {
             if (docSnap.exists()) {
                 tabs = docSnap.data().tabs;
-                if (tabs.length > 0 && (!activeTabId || !tabs.find(t => t.id === activeTabId))) {
-                    activeTabId = tabs[0].id;
-                }
+                if (tabs.length > 0 && (!activeTabId || !tabs.find(t => t.id === activeTabId))) activeTabId = tabs[0].id;
             } else {
-                // 클라우드가 비어있으면 초기 기본값(보세사 시험 등)을 세팅하고 저장합니다.
                 tabs = [{ id: Date.now(), name: "새 카운트다운", dateStr: getDefaultDateStr(100), color: "#A8B8D0", initialDays: 100 }];
                 saveData();
             }
             isDataLoaded = true;
-            if (tabs.length > 0) {
-                renderTabs();
-                updateUIFromTab(activeTabId);
-            }
+            if (tabs.length > 0) { renderTabs(); updateUIFromTab(activeTabId); }
         });
 
         function renderTabs() {
@@ -157,10 +163,8 @@
             tabs.forEach(tab => {
                 const btn = document.createElement('div');
                 btn.className = `tab ${tab.id === activeTabId ? 'active' : ''}`;
-                btn.innerHTML = `
-                    <span onclick="switchTab(${tab.id})">${tab.name || "새 목표"}</span>
-                    ${tabs.length > 1 ? `<span class="delete-btn" onclick="deleteTab(${tab.id})">×</span>` : ''}
-                `;
+                btn.innerHTML = `<span onclick="switchTab(${tab.id})">${tab.name || "새 목표"}</span>
+                                 ${tabs.length > 1 ? `<span class="delete-btn" onclick="deleteTab(${tab.id})">×</span>` : ''}`;
                 tabListEl.appendChild(btn);
             });
         }
@@ -174,21 +178,13 @@
             }
         }
 
-        // --- 외부(HTML)에서 버튼 클릭 시 모듈 안의 함수를 실행할 수 있도록 연결 ---
-        window.switchTab = (id) => {
-            activeTabId = id;
-            updateUIFromTab(id);
-            renderTabs();
-        };
-
+        window.switchTab = (id) => { activeTabId = id; updateUIFromTab(id); renderTabs(); };
         window.addTab = () => {
             if(!isDataLoaded) return;
             const newId = Date.now();
             tabs.push({ id: newId, name: "새 목표", dateStr: getDefaultDateStr(30), color: "#9EAC8E", initialDays: 30 });
-            activeTabId = newId;
-            saveData();
+            activeTabId = newId; saveData();
         };
-
         window.deleteTab = (id) => {
             if (confirm("이 카운트다운을 삭제할까요?")) {
                 tabs = tabs.filter(t => t.id !== id);
@@ -196,15 +192,7 @@
                 saveData();
             }
         };
-
-        window.updateTabName = () => {
-            const activeTab = tabs.find(t => t.id === activeTabId);
-            if(activeTab) {
-                activeTab.name = nameInputEl.value;
-                saveData();
-            }
-        };
-
+        window.updateTabName = () => { const activeTab = tabs.find(t => t.id === activeTabId); if(activeTab) { activeTab.name = nameInputEl.value; saveData(); } };
         window.updateTargetDate = () => {
             const activeTab = tabs.find(t => t.id === activeTabId);
             if(activeTab) {
@@ -212,32 +200,22 @@
                 if(activeTab.dateStr) {
                     const targetTime = new Date(activeTab.dateStr).getTime();
                     const now = new Date().getTime();
-                    activeTab.initialDays = (targetTime - now) / (1000 * 60 * 60 * 24);
+                    activeTab.initialDays = (targetTime - now) / 86400000;
                     if(activeTab.initialDays <= 0) activeTab.initialDays = 1;
                 }
                 saveData();
             }
         };
-
         window.changeColor = (colorHex) => {
             const activeTab = tabs.find(t => t.id === activeTabId);
-            if(activeTab) {
-                activeTab.color = colorHex;
-                document.documentElement.style.setProperty('--accent-color', colorHex);
-                saveData();
-            }
+            if(activeTab) { activeTab.color = colorHex; document.documentElement.style.setProperty('--accent-color', colorHex); saveData(); }
         };
 
-        // 타이머 애니메이션 엔진
         function updateTimer() {
-            if (!isDataLoaded || tabs.length === 0) {
-                requestAnimationFrame(updateTimer); return;
-            }
+            if (!isDataLoaded || tabs.length === 0) { requestAnimationFrame(updateTimer); return; }
 
             const activeTab = tabs.find(t => t.id === activeTabId);
-            if (!activeTab || !activeTab.dateStr) {
-                requestAnimationFrame(updateTimer); return;
-            }
+            if (!activeTab || !activeTab.dateStr) { requestAnimationFrame(updateTimer); return; }
 
             const targetTime = new Date(activeTab.dateStr).getTime();
             const now = new Date().getTime();
@@ -246,6 +224,7 @@
             if (difference <= 0) {
                 document.getElementById('val-days').textContent = "완료!";
                 ['days', 'hours', 'minutes', 'seconds'].forEach(u => document.getElementById(`fill-${u}`).style.height = '0%');
+                wrapperDaysEl.classList.remove('pulse-active');
                 requestAnimationFrame(updateTimer); return;
             }
 
@@ -265,6 +244,21 @@
             document.getElementById('fill-hours').style.height = ((h + (m / 60)) / 24 * 100) + '%';
             let dP = (d / activeTab.initialDays) * 100;
             document.getElementById('fill-days').style.height = (dP > 100 ? 100 : dP) + '%';
+
+            // 기능 1 & 2 로직: 임박도에 따른 효과 활성화
+            const remainingRatio = dP / 100;
+            
+            if (remainingRatio <= 0.20) {
+                document.documentElement.style.setProperty('--accent-color', '#D97373'); // 경고 색상 덮어쓰기
+            } else {
+                document.documentElement.style.setProperty('--accent-color', activeTab.color); // 원래 색상 복구
+            }
+
+            if (d <= 30) {
+                wrapperDaysEl.classList.add('pulse-active'); // 심박수 애니메이션 켜기
+            } else {
+                wrapperDaysEl.classList.remove('pulse-active'); // 심박수 애니메이션 끄기
+            }
 
             requestAnimationFrame(updateTimer);
         }
